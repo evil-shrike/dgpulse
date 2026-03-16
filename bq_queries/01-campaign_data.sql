@@ -57,6 +57,19 @@ campaigns_with_lookalikes AS (
         am.criterion_id = agc.criterion_id
     )
 ),
+channel_controls AS (
+  SELECT
+    campaign_id,
+    CASE
+      WHEN LOGICAL_OR(cc_config = 'SELECTED_CHANNELS') THEN 'Customised Coverage'
+      WHEN LOGICAL_OR(cc_strategy = 'ALL_OWNED_AND_OPERATED_CHANNELS') THEN 'Google Channels'
+      ELSE 'All Channels'
+    END AS selected_channels
+  FROM
+    `{bq_dataset}.ad_group_ad`
+  GROUP BY
+    campaign_id
+),
 targets AS (
   SELECT
     account_id,
@@ -97,10 +110,11 @@ SELECT
   C.conversions,
   OCID.ocid,
   CE.change_count_by_date,
-  CASE
-    WHEN CWL.campaign_id IS NOT NULL THEN 'YES'
-    ELSE 'NO'
-  END AS has_lookalike_audience
+  CC.selected_channels,
+  IF(CWL.campaign_id IS NOT NULL, 'YES', 'NO')
+    AS has_lookalike_audience,
+  IF(C.bidding_strategy_system_status = 'LIMITED_BY_BUDGET', 'YES', 'NO')
+    AS is_limited_by_budget
 FROM
   `{bq_dataset}.campaign_settings` AS C
   LEFT JOIN targets AS T
@@ -117,4 +131,6 @@ FROM
   LEFT JOIN `{bq_dataset}_reference_data.exchange_rates` AS ER
     ON CUST.currency_code = ER.target_currency
   LEFT JOIN campaigns_with_lookalikes AS CWL
-    ON C.campaign_id = CWL.campaign_id;
+    ON C.campaign_id = CWL.campaign_id
+  LEFT JOIN channel_controls AS CC
+    ON C.campaign_id = CC.campaign_id;
