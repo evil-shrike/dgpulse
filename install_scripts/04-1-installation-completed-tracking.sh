@@ -18,15 +18,27 @@ set -e
 echo "Tracking 'Installation Completed'..."
 
 COLLECT_BASE_URL="https://www.google-analytics.com/mp/collect"
-MEASUREMENT_ID="G-todo"
-API_SECRET="todo"
-CLIENT_ID=$(uuidgen) #generate unique client ID
+MEASUREMENT_ID="G-3E6WG3C5TD"
+API_SECRET="X9fYuV5eSvuJeE1Au_NK-A"
+
+CLIENT_ID=""
+if [ -f "google-ads.yaml" ]; then
+  CLIENT_ID=$(grep -v '^[[:space:]]*#' google-ads.yaml | grep 'login_customer_id' | head -n 1 | cut -d ':' -f2 | tr -d " '\"\r")
+fi
+
+if [ -z "$CLIENT_ID" ]; then
+  read -p "What's the highest level google ads account you'll use dgpulse for? " CLIENT_ID
+fi
 
 PAYLOAD=$(cat <<EOF
 {
   "client_id": "${CLIENT_ID}",
   "events": [{
-    "name": "installation_completed"
+    "name": "installation_completed",
+    "params": {
+      "solutions_name": "dgpulse",
+      "gads_external_ads_account_id": "${CLIENT_ID}"
+    }
   }]
 }
 EOF
