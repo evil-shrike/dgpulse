@@ -72,7 +72,7 @@ echo "Deploying Run function for AI Bubbles"
 echo "Estimated time: Less than 5 minutes"
 gcloud functions deploy dgpulse-ai-bubbles \
   --gen2 \
-  --runtime=nodejs20 \
+  --runtime=nodejs22 \
   --region=$GCP_REGION \
   --source=. \
   --entry-point=aiBubblesGET \
