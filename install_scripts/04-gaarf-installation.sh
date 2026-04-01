@@ -23,10 +23,10 @@ until [[ "$yn" == [YyNn] ]]; do
     read -p "$msg" yn
 done
 
-if [[ "$yn" == "y"  || "$yn" == "Y" ]]; then
-    ./install_scripts/04-1-installation-completed-tracking.sh
-fi
-
 echo "Initializing Google Ads data ETL Workflow..."
 echo "Estimated time: 10 minutes"
 npm init gaarf-wf@latest -- --answers=answers.json
+
+if [[ "$yn" == "y"  || "$yn" == "Y" ]]; then
+    ./install_scripts/04-1-installation-completed-tracking.sh
+fi
