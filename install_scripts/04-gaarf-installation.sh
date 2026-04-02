@@ -16,6 +16,17 @@
 set -e
 
 echo "----"
+until [[ "$yn" == [YyNn] ]]; do
+    msg='We use anonymized and aggregated data to understand how DG Pulse is '
+    msg+='being used and make improvements. Would you allow us to track it? '
+    msg+='Please respond with 'y' for yes or 'n' for no: '
+    read -p "$msg" yn
+done
+
 echo "Initializing Google Ads data ETL Workflow..."
 echo "Estimated time: 10 minutes"
 npm init gaarf-wf@latest -- --answers=answers.json
+
+if [[ "$yn" == "y"  || "$yn" == "Y" ]]; then
+    ./install_scripts/04-1-installation-completed-tracking.sh
+fi
